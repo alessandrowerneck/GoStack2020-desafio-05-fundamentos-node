@@ -15,16 +15,16 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
+    // Validating transaction type
+    if (!['income', 'outcome'].includes(type)) {
+      throw new Error('Invalid Transaction type');
+    }
+
     const { total } = this.transactionsRepository.getBalance();
 
     // Do not creating outcome transaction biger then actual balance.
     if (type === 'outcome' && total < value) {
       throw new Error('You do not have enough balance');
-    }
-
-    // Validating transaction type
-    if (type !== 'outcome' && type !== 'income') {
-      throw new Error('Ivalide Transaction type');
     }
 
     const transaction = this.transactionsRepository.create({
